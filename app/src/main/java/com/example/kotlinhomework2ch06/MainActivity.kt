@@ -11,6 +11,13 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
+    private  lateinit var btnToast : Button
+    private  lateinit var btnSnackBar : Button
+    private  lateinit var btnDialog1 : Button
+    private  lateinit var btnDialog2 : Button
+    private  lateinit var btnDialog3 : Button
+    private  val items = arrayOf("選項1", "選項2", "選項3", "選項4", "選項5")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -21,73 +28,74 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // 定義元件變數，並通過 findViewById 取得元件
-        val btnToast = findViewById<Button>(R.id.btnToast)
-        val btnSnackBar = findViewById<Button>(R.id.btnSnackBar)
-        val btnDialog1 = findViewById<Button>(R.id.btnDialog1)
-        val btnDialog2 = findViewById<Button>(R.id.btnDialog2)
-        val btnDialog3 = findViewById<Button>(R.id.btnDialog3)
+        initViews()
+        initLinsteners()
+    }
 
-        // 建立要顯示在列表上的字串
-        val item = arrayOf("選項1", "選項2", "選項3", "選項4", "選項5")
+    private  fun initViews() {
+        btnToast = findViewById(R.id.btnToast)
+        btnSnackBar = findViewById(R.id.btnSnackBar)
+        btnDialog1 = findViewById(R.id.btnDialog1)
+        btnDialog2 = findViewById(R.id.btnDialog2)
+        btnDialog3 = findViewById(R.id.btnDialog3)
+    }
 
-        // 設定按鈕的點擊事件
+    private fun initLinsteners()
+    {
         btnToast.setOnClickListener {
-            // 呼叫 showToast 方法，顯示 Toast訊息
             showToast("預設 Toast")
         }
-
         btnSnackBar.setOnClickListener {
-            // 建立 Snackbar 物件，並顯示 Snackbar 訊息
-            Snackbar.make(it, "按鈕式 Snackbar", Snackbar.LENGTH_SHORT)
-                .setAction("按鈕"){
-                    showToast("已回應")
-                }.show()
+            showCustomSnackBar(it) // 可以將 Snackbar 的邏輯也封裝起來
         }
-
         btnDialog1.setOnClickListener {
-            // 建立 AlertDialog 物件
-            AlertDialog.Builder(this)
-                // 設定標題
-                .setTitle("按鈕式 AlertDialog")
-                // 設定內容
-                .setMessage("AlertDialog內容")
-                // 設定按鈕文字與點擊事件
-                .setNeutralButton("左按鈕"){
-                    dialogInterface, which -> showToast("左按鈕")
-                }.setNegativeButton("中按鈕"){
-                    dialogInterface, which -> showToast("中按鈕")
-                }.setPositiveButton("右按鈕"){
-                    dialogInterface, which -> showToast("右按鈕")
-                }.show()
+            showButtonDialog()
         }
-
         btnDialog2.setOnClickListener {
-            // 建立 AlertDialog 物件
-            AlertDialog.Builder(this)
-                // 設定標題
-                .setTitle("列表式 AlertDialog")
-                // 設定列表項目及點擊事件
-                .setItems(item){
-                    // 顯示 Toast訊息
-                    dialogInterface, i -> showToast("你選的是${item[i]}")
-                }.show()
+            showListDialog()
         }
-
         btnDialog3.setOnClickListener {
-            // 宣告變數 position 用來記錄選擇的項目
-            var position = 0
-            // 建立 AlertDialog 物件
-            AlertDialog.Builder(this)
-                // 設定標題
-                .setTitle("單選式 AlertDialog")
-                // 設定列表項目及點擊事件，預設選擇地一個項目
-                .setSingleChoiceItems(item, 0){
-                    dialogInterface, i -> position = i
-                }.setPositiveButton("確定"){
-                    dialog, which -> showToast("你選擇的是${item[position]}")
-                }.show()
+            showSingleChoiceDialog()
         }
+    }
+
+    private fun showCustomSnackBar(view: android.view.View) {
+        Snackbar.make(view, "按鈕式 Snackbar", Snackbar.LENGTH_SHORT)
+            .setAction("按鈕") {
+                showToast("已回應")
+            }.show()
+    }
+
+    private fun showButtonDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("按鈕式 AlertDialog")
+            .setMessage("AlertDialog內容")
+            .setNeutralButton("左按鈕") { _, _ -> showToast("左按鈕") }
+            .setNegativeButton("中按鈕") { _, _ -> showToast("中按鈕") }
+            .setPositiveButton("右按鈕") { _, _ -> showToast("右按鈕") }
+            .show()
+    }
+
+    private fun showListDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("列表式 AlertDialog")
+            .setItems(items) { _, i ->
+                showToast("你選的是${items[i]}")
+            }
+            .show()
+    }
+
+    private fun showSingleChoiceDialog() {
+        var position = 0
+        AlertDialog.Builder(this)
+            .setTitle("單選式 AlertDialog")
+            .setSingleChoiceItems(items, 0) { _, i ->
+                position = i
+            }
+            .setPositiveButton("確定") { _, _ ->
+                showToast("你選擇的是${items[position]}")
+            }
+            .show()
     }
 
     private fun showToast(msg: String){
